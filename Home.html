@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Scraping Example</title>
+  </head>
+  <body>
+    <div id="output"></div>
+
+    <script>
+      // Function to fetch HTML content from a URL using Fetch API
+      async function fetchHTMLContent(url) {
+        fetch(url, {
+          method: "GET",
+          mode: "no-cors",
+          headers: {},
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(response.error);
+            }
+            // console.log(response.text());
+            return response.text();
+          })
+          .catch(function (error) {
+            document.getElementById("messages").value = error;
+          });
+      }
+
+      const testURL = 'https://time.com';
+	const myInit = {
+		method: 'GET',
+		mode: 'no-cors',
+	};
+
+	// const myRequest = new Request(testURL, myInit);
+
+	// fetch(myRequest).then(function(response) {
+	// 	return response.text();
+	// }).then(function(response) {
+	// 	console.log(response);
+	// }).catch(function(e){
+	// 	console.log(e);
+	// });
+
+    fetch('https://time.com/', {
+		method: 'HEAD',
+		mode: 'no-cors',
+	})
+    .then(function(response) {
+        // When the page is loaded convert it to text
+        return response.text()
+    })
+    .then(function(html) {
+        // Initialize the DOM parser
+        var parser = new DOMParser();
+
+        // Parse the text
+        var doc = parser.parseFromString(html, "text/html");
+
+        // You can now even select part of that html as you would in the regular DOM 
+        // Example:
+        // var docArticle = doc.querySelector('article').innerHTML;
+
+        console.log(doc);
+    })
+    .catch(function(err) {  
+        console.log('Failed to fetch page: ', err);  
+    });
+
+      // Function to extract specific data from HTML content
+      function extractData(htmlContent) {
+        // Sample extraction logic
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, "text/html");
+        const title = doc.querySelector("title").textContent;
+        const paragraph = doc.querySelector("p").textContent;
+
+        return { title, paragraph };
+      }
+
+      // Example usage
+      const url = "https://time.com"; // Replace with the URL you want to scrape
+      fetchHTMLContent(url)
+        .then((htmlContent) => {
+          if (htmlContent) {
+            console.log(htmlContent);
+            const {title,paragraph } = extractData(htmlContent);
+            document.getElementById("output").innerHTML = `
+                        <h2>Title: ${title}</h2>
+                        <p>Paragraph: ${paragraph}</p>
+                    `;
+          } else {
+            console.log("No HTML content fetched");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    </script>
+  </body>
+</html>
